@@ -23,8 +23,13 @@ function glowTexture() {
 }
 
 export class Ignition {
-  constructor(scene, statusEl) {
-    this.scene = scene;
+  constructor(root, statusEl) {
+    // Les effets sont enfants du modèle : la mèche et les comètes restent
+    // alignées au produit même lorsqu'il est présenté en diagonale.
+    this.scene = root;
+    root.updateMatrixWorld(true);
+    const worldQ = root.getWorldQuaternion(new THREE.Quaternion());
+    this.gravity = new THREE.Vector3(0, -1, 0).applyQuaternion(worldQ.invert());
     this.statusEl = statusEl;
     this.active = false;
     this.phase = 'idle';     // idle | fuse | firing | done
@@ -237,7 +242,7 @@ export class Ignition {
     for (let i = this.stars.length - 1; i >= 0; i--) {
       const s = this.stars[i];
       s.age += dt;
-      s.vel.y -= 1.55 * dt;
+      s.vel.addScaledVector(this.gravity, 1.55 * dt);
       s.mesh.position.addScaledVector(s.vel, dt);
       s.light.position.copy(s.mesh.position);
 
@@ -276,7 +281,7 @@ export class Ignition {
         dirty = true;
         continue;
       }
-      s.vel.y -= 1.9 * dt;
+      s.vel.addScaledVector(this.gravity, 1.9 * dt);
       pos.setXYZ(i, pos.getX(i) + s.vel.x * dt, pos.getY(i) + s.vel.y * dt, pos.getZ(i) + s.vel.z * dt);
       dirty = true;
     }

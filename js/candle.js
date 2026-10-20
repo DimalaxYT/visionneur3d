@@ -3,23 +3,23 @@
 import * as THREE from 'three';
 
 export const M = {
-  R_TUBE: 0.0105,      // rayon extérieur du tube habillé
-  R_RIM: 0.0113,       // bourrelet carton (bouche)
-  R_BORE: 0.0070,      // alésage intérieur
-  R_CAP: 0.0109,       // capuchon bas
-  Y0: 0.012,           // bas de l'étiquette
-  L_LABEL: 0.398,      // longueur habillée
-  H_RIM: 0.010,        // hauteur du bourrelet
+  R_TUBE: 0.0085,      // rayon extérieur, Ø 17 mm comme le tube de référence
+  R_RIM: 0.0088,       // lèvre discrète du tube
+  R_BORE: 0.0050,      // alésage intérieur
+  R_CAP: 0.0087,       // capuchon bleu bas
+  Y0: 0.016,           // bas de l'étiquette, au-dessus du capuchon bleu
+  L_LABEL: 0.398,      // longueur habillée (ratio élancé ~24:1)
+  H_RIM: 0.0035,       // lèvre très fine au sommet
 };
-M.Y1 = M.Y0 + M.L_LABEL;          // 0.410 — pied du bourrelet
-M.Y_TOP = M.Y1 + M.H_RIM;         // 0.420 — bouche du tube
+M.Y1 = M.Y0 + M.L_LABEL;
+M.Y_TOP = M.Y1 + M.H_RIM;
 
-// Points de la mèche visco (bézier cubique, identique au rendu de contrôle)
+// Mèche rouge courte et fine, telle qu'elle apparaît sur la photo.
 const FUSE = [
-  new THREE.Vector3(0.002, M.Y_TOP - 0.022, 0.002),
-  new THREE.Vector3(0.010, M.Y_TOP + 0.024, 0.008),
-  new THREE.Vector3(0.040, M.Y_TOP + 0.030, 0.016),
-  new THREE.Vector3(0.062, M.Y_TOP + 0.002, 0.024),
+  new THREE.Vector3(0.000, M.Y_TOP - 0.001, 0.000),
+  new THREE.Vector3(0.002, M.Y_TOP + 0.0015, 0.000),
+  new THREE.Vector3(0.006, M.Y_TOP + 0.0050, 0.000),
+  new THREE.Vector3(0.010, M.Y_TOP + 0.0040, 0.000),
 ];
 
 export function fuseCurve() {
@@ -34,21 +34,19 @@ function kraftRingTexture() {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const g = c.getContext('2d');
-  g.fillStyle = '#b28b5c';
+  g.fillStyle = '#17354f';
   g.fillRect(0, 0, 256, 256);
-  // anneaux concentriques du carton stratifié
+  // très fines strates bleu nuit sur la tranche du tube
   for (let r = 8; r < 180; r += 7) {
-    const k = 0.88 + 0.18 * Math.sin(r * 0.9);
     g.beginPath();
     g.arc(128, 128, r, 0, Math.PI * 2);
-    g.strokeStyle = `rgba(${Math.round(178 * k)}, ${Math.round(139 * k)}, ${Math.round(92 * k)}, 0.9)`;
-    g.lineWidth = 3.4;
+    g.strokeStyle = 'rgba(65,118,150,0.55)';
+    g.lineWidth = 2.2;
     g.stroke();
   }
-  // tranche extérieure plus sombre
   const grad = g.createRadialGradient(128, 128, 120, 128, 128, 128);
-  grad.addColorStop(0, 'rgba(60,40,20,0)');
-  grad.addColorStop(1, 'rgba(60,40,20,0.55)');
+  grad.addColorStop(0, 'rgba(5,12,22,0)');
+  grad.addColorStop(1, 'rgba(5,12,22,0.52)');
   g.fillStyle = grad;
   g.fillRect(0, 0, 256, 256);
   const t = new THREE.CanvasTexture(c);
@@ -63,11 +61,11 @@ function fuseTexture() {
   c.height = 64;
   const g = c.getContext('2d');
   const grad = g.createLinearGradient(0, 0, 512, 0);
-  grad.addColorStop(0.0, '#2c5e2c');
-  grad.addColorStop(0.78, '#2c5e2c');
-  grad.addColorStop(0.84, '#4a3520');
-  grad.addColorStop(0.93, '#3a2a18');
-  grad.addColorStop(1.0, '#241a10');
+  grad.addColorStop(0.0, '#d72731');
+  grad.addColorStop(0.72, '#db2930');
+  grad.addColorStop(0.84, '#8a2028');
+  grad.addColorStop(0.93, '#5b2026');
+  grad.addColorStop(1.0, '#32181b');
   g.fillStyle = grad;
   g.fillRect(0, 0, 512, 64);
   // rayures de tresse
@@ -148,7 +146,7 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
 
   // --- bourrelet carton (latéral) ---
   const kraft = new THREE.MeshStandardMaterial({
-    color: 0xb28b5c,
+    color: 0x17334b,
     roughness: 0.82,
     metalness: 0.0,
     side: THREE.DoubleSide,
@@ -177,7 +175,7 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
 
   // --- paroi intérieure de l'alésage + fond obscurci ---
   const boreMat = new THREE.MeshStandardMaterial({
-    color: 0x4d331f,
+    color: 0x20242c,
     roughness: 0.95,
     metalness: 0,
     side: THREE.DoubleSide,
@@ -191,7 +189,7 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
 
   const boreFloor = new THREE.Mesh(
     new THREE.CircleGeometry(M.R_BORE, 64),
-    new THREE.MeshStandardMaterial({ color: 0x140c06, roughness: 1, metalness: 0 })
+    new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 1, metalness: 0 })
   );
   boreFloor.rotation.x = -Math.PI / 2;
   boreFloor.position.y = M.Y_TOP - 0.030;
@@ -199,8 +197,8 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
 
   // --- capuchon bas plastique ---
   const capMat = new THREE.MeshStandardMaterial({
-    color: 0xb4142c,
-    roughness: 0.38,
+    color: 0x1479c9,
+    roughness: 0.34,
     metalness: 0.12,
     side: THREE.DoubleSide,
   });
@@ -220,7 +218,7 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
     side: THREE.DoubleSide,
   });
   const fuse = new THREE.Mesh(
-    new THREE.TubeGeometry(fuseCurve(), 72, 0.00175, 12, false),
+    new THREE.TubeGeometry(fuseCurve(), 24, 0.00055, 8, false),
     fuseMat
   );
   fuse.castShadow = true;
@@ -229,8 +227,8 @@ export async function buildCandle({ labelURL = 'assets/label.png' } = {}) {
 
   // petite pointe à l'extrémité de la mèche
   const tip = new THREE.Mesh(
-    new THREE.SphereGeometry(0.0019, 12, 10),
-    new THREE.MeshStandardMaterial({ color: 0x241a10, roughness: 0.9 })
+    new THREE.SphereGeometry(0.00072, 10, 8),
+    new THREE.MeshStandardMaterial({ color: 0x5b2026, roughness: 0.9 })
   );
   const tipPt = fuseCurve().getPoint(1);
   tip.position.copy(tipPt);
