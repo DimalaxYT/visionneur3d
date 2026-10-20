@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chandelle romaine — visionneur 3D</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene"></canvas>
+
+    <header class="panel title-panel">
+      <h1>Chandelle romaine</h1>
+      <p class="subtitle">Modèle 3D interactif — 10 étoiles · cal. 20 mm</p>
+    </header>
+
+    <aside class="panel controls-panel">
+      <h2>Points de vue</h2>
+      <div class="btn-row">
+        <button data-view="product" class="active">Vue produit</button>
+        <button data-view="muzzle">Vue mèche</button>
+        <button data-view="top">Vue dessus</button>
+        <button data-view="hero">Héro 3/4</button>
+      </div>
+
+      <h2>Animation</h2>
+      <div class="btn-row">
+        <button id="btn-rotate">Rotation auto</button>
+        <button id="btn-ignite">🔥 Allumer la mèche</button>
+        <button id="btn-reset">Réinitialiser</button>
+      </div>
+
+      <h2>Fiche technique</h2>
+      <ul class="specs">
+        <li><span>Hauteur</span><b>42 cm</b></li>
+        <li><span>Diamètre</span><b>21 mm</b></li>
+        <li><span>Effets</span><b>10 comètes</b></li>
+        <li><span>Mèche</span><b>visco tressée</b></li>
+        <li><span>Texture</span><b>étiquette papier</b></li>
+      </ul>
+      <p class="hint">Souris : orbite · molette : zoom · clic droit : déplacer</p>
+    </aside>
+
+    <div id="status" class="panel status-panel hidden"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
